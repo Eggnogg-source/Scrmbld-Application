@@ -1,7 +1,219 @@
 .album-detail {
-  padding: 2rem;
-  max-width: 1200px;
+  padding: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba(18, 18, 18, 0) 0%, #121212 100%);
+}
+
+.album-header-wrapper {
+  position: relative;
+  padding: 2rem 2rem 0 2rem;
+  /* Dynamic gradient based on album colors - similar to Spotify */
+  background: linear-gradient(
+    180deg,
+    var(--gradient-primary, rgba(80, 53, 80, 0.6)) 0%,
+    var(--gradient-secondary, rgba(60, 40, 60, 0.4)) 40%,
+    var(--gradient-tertiary, rgba(30, 20, 30, 0.2)) 70%,
+    #121212 100%
+  );
+  min-height: 400px;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 2rem;
+  transition: background 0.8s ease;
+  /* Add a subtle overlay for better text readability */
+  position: relative;
+}
+
+.album-header-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(18, 18, 18, 0.3) 50%,
+    rgba(18, 18, 18, 0.6) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.album-header-wrapper > * {
+  position: relative;
+  z-index: 1;
+}
+
+.album-header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.album-image {
+  width: 232px;
+  height: 232px;
+  object-fit: cover;
+  border-radius: 0;
+  box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+}
+
+.album-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 0.5rem;
+}
+
+.album-info h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 6rem;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.album-info h2 {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  color: #ffffff;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.album-info h2 a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.album-info h2 a:hover {
+  text-decoration: underline;
+}
+
+.release-date,
+.track-count {
+  margin: 0.25rem 0;
+  color: #b3b3b3;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.album-actions {
+  margin: 1.5rem 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.listened-toggle {
+  padding: 0.875rem 2rem;
+  border-radius: 500px;
+  background: #1db954;
+  color: #000000;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.listened-toggle.listened {
+  background: #1db954;
+  color: #000000;
+}
+
+.listened-toggle.not-listened {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.listened-toggle:hover {
+  background: #1ed760;
+  transform: scale(1.05);
+  border-color: transparent;
+}
+
+.listened-toggle.not-listened:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.album-notes-section {
+  padding: 0 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.tracks-section {
+  padding: 0 2rem 2rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.tracks-list {
+  background: transparent;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.tracks-header {
+  display: grid;
+  grid-template-columns: [index] 16px [first] 4fr [var1] 2fr [last] minmax(120px, 1fr);
+  gap: 16px;
+  padding: 0 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  color: #b3b3b3;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.tracks-header-number {
+  grid-column: index;
+  text-align: center;
+}
+
+.tracks-header-title {
+  grid-column: first / var1;
+}
+
+.tracks-header-rating {
+  grid-column: last;
+  text-align: right;
+}
+
+.track-wrapper {
+  border-bottom: none;
+  background: transparent;
+}
+
+.track-wrapper:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.track-detail-view {
+  padding: 0 1rem 1rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  margin: 0.5rem 0;
 }
 
 .loading-container,
@@ -9,112 +221,10 @@
   text-align: center;
   padding: 3rem;
   font-size: 1.2rem;
+  color: #ffffff;
 }
 
 .error-container {
-  color: #c33;
-}
-
-.album-header {
-  display: flex;
-  gap: 2rem;
-  margin-bottom: 3rem;
-  padding-bottom: 2rem;
-  border-bottom: 2px solid #e0e0e0;
-}
-
-.album-image {
-  width: 250px;
-  height: 250px;
-  object-fit: cover;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.album-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.album-info h1 {
-  margin: 0 0 0.5rem 0;
-  font-size: 2.5rem;
-  color: #333;
-}
-
-.album-info h2 {
-  margin: 0 0 1rem 0;
-  font-size: 1.5rem;
-  color: #666;
-  font-weight: 400;
-}
-
-.release-date,
-.track-count {
-  margin: 0.5rem 0;
-  color: #666;
-  font-size: 1rem;
-}
-
-.album-actions {
-  margin: 1rem 0;
-}
-
-.listened-toggle {
-  padding: 0.5rem 1rem;
-  border: 2px solid #1db954;
-  border-radius: 4px;
-  background: white;
-  color: #1db954;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.listened-toggle.listened {
-  background: #1db954;
-  color: white;
-}
-
-.listened-toggle.not-listened {
-  background: white;
-  color: #1db954;
-}
-
-.listened-toggle:hover {
-  background: #1ed760;
-  color: white;
-  border-color: #1ed760;
-}
-
-.tracks-section {
-  margin-top: 2rem;
-}
-
-.tracks-section h2 {
-  margin-bottom: 1rem;
-  color: #333;
-}
-
-.tracks-list {
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.track-wrapper {
-  border-bottom: 2px solid #e0e0e0;
-}
-
-.track-wrapper:last-child {
-  border-bottom: none;
-}
-
-.track-detail-view {
-  padding: 0 1rem 1rem 1rem;
-  background: #f9f9f9;
+  color: #e22134;
 }
 

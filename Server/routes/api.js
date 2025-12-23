@@ -468,10 +468,7 @@ router.post('/tracks/:id/notes', async (req, res) => {
     const { id } = req.params;
     const { spotifyUserId, content } = req.body;
 
-    console.log(`[POST /tracks/:id/notes] Track ID: ${id}, User ID: ${spotifyUserId}, Content length: ${content?.length || 0}`);
-
     if (!spotifyUserId || !content) {
-      console.log(`[POST /tracks/:id/notes] Missing required fields - spotifyUserId: ${!!spotifyUserId}, content: ${!!content}`);
       return res.status(400).json({ error: 'spotifyUserId and content are required' });
     }
 
@@ -486,50 +483,31 @@ router.post('/tracks/:id/notes', async (req, res) => {
 
     let trackId;
     if (trackResult.rows.length === 0) {
-      // Track doesn't exist in DB yet - create a minimal track entry
-      // album_id can be NULL (will be updated when album is synced)
-      try {
-        const insertResult = await pool.query(
-          `INSERT INTO tracks (spotify_id, name, duration_ms, track_number, album_id)
-           VALUES ($1, $2, $3, $4, NULL)
-           ON CONFLICT (spotify_id) DO NOTHING
-           RETURNING id`,
-          [id, 'Unknown Track', 0, 0]
-        );
-        
-        if (insertResult.rows.length > 0) {
-          trackId = insertResult.rows[0].id;
-        } else {
-          // Track was created by another request, fetch it
-          const retryResult = await pool.query(
-            'SELECT id FROM tracks WHERE spotify_id = $1',
-            [id]
-          );
-          if (retryResult.rows.length > 0) {
-            trackId = retryResult.rows[0].id;
-          } else {
-            return res.status(500).json({ error: 'Failed to create track entry' });
-          }
-        }
-      } catch (insertError) {
-        console.error('[POST /tracks/:id/notes] Error creating track:', insertError);
-        // If insert fails, try to get the track again (might have been created by another request)
+      // Track doesn't exist - create minimal entry
+      const insertResult = await pool.query(
+        `INSERT INTO tracks (spotify_id, name, duration_ms, track_number, album_id)
+         VALUES ($1, $2, $3, $4, NULL)
+         ON CONFLICT (spotify_id) DO NOTHING
+         RETURNING id`,
+        [id, 'Unknown Track', 0, 0]
+      );
+      
+      if (insertResult.rows.length > 0) {
+        trackId = insertResult.rows[0].id;
+      } else {
+        // Track was created by another request, fetch it
         const retryResult = await pool.query(
           'SELECT id FROM tracks WHERE spotify_id = $1',
           [id]
         );
-        if (retryResult.rows.length > 0) {
-          trackId = retryResult.rows[0].id;
-        } else {
-          return res.status(500).json({ error: 'Failed to create track entry', details: insertError.message });
+        if (retryResult.rows.length === 0) {
+          return res.status(500).json({ error: 'Failed to create track entry' });
         }
+        trackId = retryResult.rows[0].id;
       }
     } else {
       trackId = trackResult.rows[0].id;
     }
-
-    // Get or create user
-    const dbUserId = await getOrCreateUser(spotifyUserId);
 
     // Check if note exists (one note per user per track)
     const existingNote = await pool.query(
@@ -557,12 +535,10 @@ router.post('/tracks/:id/notes', async (req, res) => {
       );
     }
 
-    console.log(`[POST /tracks/:id/notes] Success - Note ${existingNote.rows.length > 0 ? 'updated' : 'created'}`);
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    console.error('[POST /tracks/:id/notes] Error saving note:', error);
-    console.error('[POST /tracks/:id/notes] Error stack:', error.stack);
-    res.status(500).json({ error: 'Failed to save note', details: error.message });
+    console.error('Error saving note:', error);
+    res.status(500).json({ error: 'Failed to save note' });
   }
 });
 
@@ -954,37 +930,62 @@ router.post('/albums/sync', async (req, res) => {
   try {
     const { album, tracks } = req.body;
 
-    if (!album || !tracks || !Array.isArray(tracks)) {
-      return res.status(400).json({ error: 'album and tracks array are required' });
+    if (!album || !album.id) {
+      return res.status(400).json({ error: 'album with id is required' });
+    }
+
+    if (!tracks || !Array.isArray(tracks)) {
+      return res.status(400).json({ error: 'tracks array is required' });
     }
 
     // Get or create album
     const albumId = await getOrCreateAlbum(album.id, {
-      name: album.name,
-      artist: album.artists?.[0]?.name || 'Unknown',
+      name: album.name || 'Unknown Album',
+      artist: album.artists?.[0]?.name || 'Unknown Artist',
       image_url: album.images?.[0]?.url || null,
       release_date: album.release_date || null,
     });
 
     // Get or create tracks
     const trackIds = [];
+    let skippedCount = 0;
+    
     for (const track of tracks) {
-      const trackId = await getOrCreateTrack(track.id, {
-        name: track.name,
-        duration_ms: track.duration_ms,
-        track_number: track.track_number,
-      }, albumId);
-      trackIds.push(trackId);
+      if (!track) {
+        skippedCount++;
+        continue;
+      }
+      
+      // Handle different track structures from Spotify
+      const trackId = track.id || track.uri?.split(':').pop();
+      if (!trackId) {
+        skippedCount++;
+        continue;
+      }
+      
+      try {
+        const dbTrackId = await getOrCreateTrack(trackId, {
+          name: track.name || 'Unknown Track',
+          duration_ms: track.duration_ms || null,
+          track_number: track.track_number || null,
+        }, albumId);
+        trackIds.push(dbTrackId);
+      } catch (trackError) {
+        console.error('Error creating track:', trackError.message, 'Track:', trackId);
+        skippedCount++;
+      }
     }
 
     res.status(201).json({
       message: 'Album and tracks synced successfully',
       albumId,
       trackIds,
+      skipped: skippedCount,
     });
   } catch (error) {
-    console.error('Error syncing album:', error);
-    res.status(500).json({ error: 'Failed to sync album' });
+    console.error('Error syncing album:', error.message);
+    console.error('Stack:', error.stack);
+    res.status(500).json({ error: 'Failed to sync album', details: error.message });
   }
 });
 

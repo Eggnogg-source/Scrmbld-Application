@@ -2,6 +2,8 @@
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
+  min-height: 100vh;
+  background-color: #121212;
 }
 
 .login-prompt {
@@ -11,33 +13,39 @@
   justify-content: center;
   min-height: 60vh;
   text-align: center;
+  background-color: #121212;
 }
 
 .login-prompt h1 {
   font-size: 3rem;
   margin-bottom: 1rem;
-  color: #333;
+  color: #ffffff;
+  font-weight: 900;
 }
 
 .login-prompt p {
   font-size: 1.2rem;
-  color: #666;
+  color: #b3b3b3;
   margin-bottom: 2rem;
 }
 
 .login-button {
   background-color: #1db954;
-  color: white;
+  color: #000000;
   border: none;
   padding: 1rem 2rem;
-  border-radius: 50px;
+  border-radius: 500px;
   font-size: 1.1rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .login-button:hover {
   background-color: #1ed760;
+  transform: scale(1.05);
 }
 
 .loading-container,
@@ -45,45 +53,57 @@
   text-align: center;
   padding: 3rem;
   font-size: 1.2rem;
+  color: #ffffff;
 }
 
 .error-container {
-  color: #c33;
+  color: #e22134;
 }
 
 .library-header {
   margin-bottom: 2rem;
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, #121212 0%, rgba(18, 18, 18, 0.8) 100%);
+  padding: 1rem 0;
+  z-index: 10;
+  backdrop-filter: blur(10px);
 }
 
 .library-header h1 {
   margin-bottom: 1.5rem;
-  color: #333;
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 700;
 }
 
 .tabs {
   display: flex;
-  gap: 1rem;
-  border-bottom: 2px solid #e0e0e0;
+  gap: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .tab {
   background: none;
   border: none;
   padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
   cursor: pointer;
-  color: #666;
+  color: #b3b3b3;
   border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  transition: color 0.2s;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .tab:hover {
-  color: #333;
+  color: #ffffff;
 }
 
 .tab.active {
-  color: #1db954;
+  color: #ffffff;
   border-bottom-color: #1db954;
 }
 
@@ -94,16 +114,23 @@
 .search-input {
   width: 100%;
   max-width: 500px;
-  padding: 0.75rem 1rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 500px;
+  font-size: 0.875rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  transition: all 0.2s;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #1db954;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .library-content {
@@ -113,24 +140,25 @@
 .albums-grid,
 .playlists-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 1.5rem;
 }
 
 .album-card,
 .playlist-card {
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.2s;
   border-radius: 8px;
   overflow: hidden;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  position: relative;
 }
 
 .album-card:hover,
 .playlist-card:hover {
+  background: rgba(255, 255, 255, 0.1);
   transform: translateY(-4px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .album-cover,
@@ -138,18 +166,22 @@
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .album-card-info,
 .playlist-card-info {
-  padding: 1rem;
+  padding: 0;
 }
 
 .album-card-info h3,
 .playlist-card-info h3 {
   margin: 0 0 0.5rem 0;
   font-size: 1rem;
-  color: #333;
+  font-weight: 700;
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -158,8 +190,8 @@
 .album-card-info p,
 .playlist-card-info p {
   margin: 0;
-  font-size: 0.85rem;
-  color: #666;
+  font-size: 0.875rem;
+  color: #b3b3b3;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -175,36 +207,38 @@
 }
 
 .pagination-button {
-  background-color: #1db954;
-  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
   border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 4px;
-  font-size: 1rem;
+  border-radius: 500px;
+  font-size: 0.875rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .pagination-button:hover:not(:disabled) {
-  background-color: #1ed760;
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
 }
 
 .pagination-button:disabled {
-  background-color: #ccc;
+  background-color: rgba(255, 255, 255, 0.05);
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .pagination-info {
-  font-size: 1rem;
-  color: #666;
-  font-weight: 500;
+  font-size: 0.875rem;
+  color: #b3b3b3;
+  font-weight: 400;
 }
 
 .no-results {
   text-align: center;
   padding: 3rem;
-  color: #666;
+  color: #b3b3b3;
   font-size: 1.1rem;
 }
 

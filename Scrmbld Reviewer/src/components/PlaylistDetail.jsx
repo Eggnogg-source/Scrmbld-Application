@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { makeRequest, getAllPlaylistTracks, formatDuration } from '../services/spotifyApi';
 import TrackCard from './TrackCard';
 import TrackNotes from './TrackNotes';
+import { extractColorsFromImage } from '../utils/colorExtractor';
 import './AlbumDetail.css';
 
 function PlaylistDetail({ userId }) {
@@ -12,6 +13,8 @@ function PlaylistDetail({ userId }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [gradientColors, setGradientColors] = useState(null);
+  const headerWrapperRef = useRef(null);
   const itemsPerPage = 20;
 
   useEffect(() => {
@@ -19,6 +22,22 @@ function PlaylistDetail({ userId }) {
       loadPlaylistData();
     }
   }, [playlistId, currentPage]);
+
+  // Extract colors from playlist image when playlist loads
+  useEffect(() => {
+    if (playlist?.images?.[0]?.url) {
+      extractColorsFromImage(playlist.images[0].url).then(colors => {
+        setGradientColors(colors);
+        // Apply colors to CSS variables
+        if (headerWrapperRef.current) {
+          const element = headerWrapperRef.current;
+          element.style.setProperty('--gradient-primary', colors.primaryRgba);
+          element.style.setProperty('--gradient-secondary', colors.secondaryRgba);
+          element.style.setProperty('--gradient-tertiary', colors.tertiaryRgba);
+        }
+      });
+    }
+  }, [playlist]);
 
   const loadPlaylistData = async () => {
     try {
@@ -76,25 +95,31 @@ function PlaylistDetail({ userId }) {
   return (
     <div className="album-detail">
       {playlist && (
-        <div className="album-header">
-          {playlist.images && playlist.images[0] && (
-            <img
-              src={playlist.images[0].url}
-              alt={playlist.name}
-              className="album-image"
-            />
-          )}
-          <div className="album-info">
-            <h1>{playlist.name}</h1>
-            <h2>{playlist.owner?.display_name || 'Unknown'}</h2>
-            <p className="track-count">{playlist.tracks.total} tracks</p>
+        <div className="album-header-wrapper" ref={headerWrapperRef}>
+          <div className="album-header">
+            {playlist.images && playlist.images[0] && (
+              <img
+                src={playlist.images[0].url}
+                alt={playlist.name}
+                className="album-image"
+              />
+            )}
+            <div className="album-info">
+              <h1>{playlist.name}</h1>
+              <h2>{playlist.owner?.display_name || 'Unknown'}</h2>
+              <p className="track-count">{playlist.tracks.total} songs</p>
+            </div>
           </div>
         </div>
       )}
 
       <div className="tracks-section">
-        <h2>Tracks (Page {currentPage} of {totalPages})</h2>
         <div className="tracks-list">
+          <div className="tracks-header">
+            <div className="tracks-header-number">#</div>
+            <div className="tracks-header-title">Title</div>
+            <div className="tracks-header-rating">Rating</div>
+          </div>
           {tracks.map((track, index) => (
             <div key={track.id || index} className="track-wrapper">
               <TrackCard

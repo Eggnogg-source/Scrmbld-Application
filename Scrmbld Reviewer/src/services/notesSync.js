@@ -1,13 +1,7 @@
 import { notesApi, albumNotesApi } from './api';
 
-/**
- * Sync service for notes - handles localStorage + Supabase sync
- * Provides intelligent syncing with conflict resolution
- */
-
-// Track note sync
+// Sync service for notes - handles localStorage + server sync with conflict resolution
 export const trackNotesSync = {
-  // Get note - intelligently syncs between localStorage and Supabase
   get: async (trackId, userId) => {
     const storageKey = `track_note_${userId}_${trackId}`;
     const localContent = localStorage.getItem(storageKey) || '';
@@ -55,7 +49,6 @@ export const trackNotesSync = {
     }
   },
 
-  // Save note - saves to localStorage immediately, syncs to Supabase in background
   save: async (trackId, userId, content) => {
     const storageKey = `track_note_${userId}_${trackId}`;
     
@@ -71,9 +64,9 @@ export const trackNotesSync = {
       try {
         await notesApi.saveTrackNote(trackId, userId, content.trim());
       } catch (error) {
-        // If sync fails, mark for retry later
-        console.error('Failed to sync note to server:', error);
-        // Store failed syncs for retry
+        if (!error.isConnectionError) {
+          console.error('Failed to sync note:', error);
+        }
         const failedSyncs = JSON.parse(localStorage.getItem('failed_note_syncs') || '[]');
         // Remove any existing failed sync for this track
         const filtered = failedSyncs.filter(s => 
@@ -89,16 +82,16 @@ export const trackNotesSync = {
         localStorage.setItem('failed_note_syncs', JSON.stringify(filtered));
       }
     } else {
-      // Delete from Supabase
       try {
         await notesApi.deleteTrackNote(trackId, userId);
       } catch (error) {
-        console.error('Failed to delete note from server:', error);
+        if (!error.isConnectionError) {
+          console.error('Failed to delete note:', error);
+        }
       }
     }
   },
 
-  // Delete note
   delete: async (trackId, userId) => {
     const storageKey = `track_note_${userId}_${trackId}`;
     localStorage.removeItem(storageKey);
@@ -106,14 +99,14 @@ export const trackNotesSync = {
     try {
       await notesApi.deleteTrackNote(trackId, userId);
     } catch (error) {
-      console.error('Failed to delete note from server:', error);
+      if (!error.isConnectionError) {
+        console.error('Failed to delete note:', error);
+      }
     }
   },
 };
 
-// Album note sync
 export const albumNotesSync = {
-  // Get note - intelligently syncs between localStorage and Supabase
   get: async (albumId, userId) => {
     const storageKey = `album_note_${userId}_${albumId}`;
     const localContent = localStorage.getItem(storageKey) || '';
@@ -165,21 +158,19 @@ export const albumNotesSync = {
   save: async (albumId, userId, content) => {
     const storageKey = `album_note_${userId}_${albumId}`;
     
-    // Save to localStorage immediately for instant feedback
     if (content.trim()) {
       localStorage.setItem(storageKey, content.trim());
     } else {
       localStorage.removeItem(storageKey);
     }
     
-    // Sync to Supabase in background (don't block UI)
     if (content.trim()) {
       try {
         await albumNotesApi.saveAlbumNote(albumId, userId, content.trim());
       } catch (error) {
-        // If sync fails, mark for retry later
-        console.error('Failed to sync album note to server:', error);
-        // Store failed syncs for retry
+        if (!error.isConnectionError) {
+          console.error('Failed to sync album note:', error);
+        }
         const failedSyncs = JSON.parse(localStorage.getItem('failed_note_syncs') || '[]');
         // Remove any existing failed sync for this album
         const filtered = failedSyncs.filter(s => 
@@ -195,16 +186,16 @@ export const albumNotesSync = {
         localStorage.setItem('failed_note_syncs', JSON.stringify(filtered));
       }
     } else {
-      // Delete from Supabase
       try {
         await albumNotesApi.deleteAlbumNote(albumId, userId);
       } catch (error) {
-        console.error('Failed to delete album note from server:', error);
+        if (!error.isConnectionError) {
+          console.error('Failed to delete album note:', error);
+        }
       }
     }
   },
 
-  // Delete note
   delete: async (albumId, userId) => {
     const storageKey = `album_note_${userId}_${albumId}`;
     localStorage.removeItem(storageKey);
@@ -212,21 +203,20 @@ export const albumNotesSync = {
     try {
       await albumNotesApi.deleteAlbumNote(albumId, userId);
     } catch (error) {
-      console.error('Failed to delete album note from server:', error);
+      if (!error.isConnectionError) {
+        console.error('Failed to delete album note:', error);
+      }
     }
   },
 };
 
-// Retry failed syncs (call this periodically or on app load)
 export const retryFailedSyncs = async (userId) => {
   const failedSyncs = JSON.parse(localStorage.getItem('failed_note_syncs') || '[]');
   if (failedSyncs.length === 0) return;
 
-  const successful = [];
   const remaining = [];
   
   for (const sync of failedSyncs) {
-    // Skip syncs older than 7 days
     if (Date.now() - sync.timestamp > 7 * 24 * 60 * 60 * 1000) {
       continue;
     }
@@ -234,21 +224,14 @@ export const retryFailedSyncs = async (userId) => {
     try {
       if (sync.type === 'track') {
         await notesApi.saveTrackNote(sync.trackId, userId, sync.content);
-        successful.push(sync);
       } else if (sync.type === 'album') {
         await albumNotesApi.saveAlbumNote(sync.albumId, userId, sync.content);
-        successful.push(sync);
       }
     } catch (error) {
-      console.error('Retry failed for sync:', error);
+      console.error('Retry failed:', error);
       remaining.push(sync);
     }
   }
 
-  // Update failed syncs list
   localStorage.setItem('failed_note_syncs', JSON.stringify(remaining));
-  
-  if (successful.length > 0) {
-    console.log(`Successfully synced ${successful.length} note(s)`);
-  }
 };

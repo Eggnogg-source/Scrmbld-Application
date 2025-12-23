@@ -9,6 +9,24 @@ const api = axios.create({
   },
 });
 
+// Add response interceptor to handle connection errors gracefully
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Suppress connection refused errors (server not running) - these are expected
+    if (error.code === 'ERR_NETWORK' || error.message?.includes('ERR_CONNECTION_REFUSED')) {
+      // Return a rejected promise but don't log as error
+      return Promise.reject({
+        ...error,
+        isConnectionError: true,
+        message: 'Server not available',
+      });
+    }
+    // For other errors, log and reject normally
+    return Promise.reject(error);
+  }
+);
+
 // Reviews API
 export const reviewsApi = {
   // Get reviews for a track

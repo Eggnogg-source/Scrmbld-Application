@@ -18,11 +18,7 @@ function LibraryView() {
   const itemsPerPage = 20;
 
   useEffect(() => {
-    // #region agent log
-    const isAuth = isAuthenticated();
-    fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LibraryView.jsx:14',message:'LibraryView useEffect',data:{isAuthenticated:isAuth,activeTab:activeTab,currentPage:currentPage},timestamp:Date.now(),sessionId:'debug-session',runId:'pagination',hypothesisId:'F'})}).catch(()=>{});
-    // #endregion
-    if (isAuth) {
+    if (isAuthenticated()) {
       loadLibrary();
     }
   }, [activeTab, currentPage]);
@@ -42,20 +38,12 @@ function LibraryView() {
 
   const loadLibrary = async () => {
     try {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LibraryView.jsx:30',message:'loadLibrary started',data:{activeTab:activeTab,currentPage:currentPage,searchQuery:searchQuery},timestamp:Date.now(),sessionId:'debug-session',runId:'pagination',hypothesisId:'F'})}).catch(()=>{});
-      // #endregion
       setLoading(true);
       setError(null);
 
       const offset = (currentPage - 1) * itemsPerPage;
-      
-      // #region agent log
-      const startTime = Date.now();
-      fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LibraryView.jsx:38',message:'Starting paginated API call',data:{offset:offset,limit:itemsPerPage,tab:activeTab},timestamp:Date.now(),sessionId:'debug-session',runId:'pagination',hypothesisId:'G'})}).catch(()=>{});
-      // #endregion
-
       let data, total;
+      
       if (activeTab === 'albums') {
         const response = await getSavedAlbums(itemsPerPage, offset);
         data = response.items;
@@ -65,11 +53,6 @@ function LibraryView() {
         data = response.items;
         total = response.total;
       }
-
-      // #region agent log
-      const endTime = Date.now();
-      fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LibraryView.jsx:50',message:'Paginated API call completed',data:{itemsCount:data?.length||0,total:total,duration:endTime-startTime,page:currentPage},timestamp:Date.now(),sessionId:'debug-session',runId:'pagination',hypothesisId:'G'})}).catch(()=>{});
-      // #endregion
 
       if (activeTab === 'albums') {
         setAlbums(data);
@@ -81,9 +64,6 @@ function LibraryView() {
       
       setTotalPages(Math.ceil(total / itemsPerPage));
     } catch (err) {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LibraryView.jsx:62',message:'loadLibrary error',data:{error:err.message,errorName:err.name,errorStack:err.stack?.substring(0,300)},timestamp:Date.now(),sessionId:'debug-session',runId:'pagination',hypothesisId:'H'})}).catch(()=>{});
-      // #endregion
       setError('Failed to load library');
       console.error(err);
     } finally {

@@ -31,17 +31,11 @@ function CommentsSection({ trackId, userId }) {
     if (!newComment.trim() || !userId) return;
 
     try {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CommentsSection.jsx:31',message:'Comment create attempt',data:{trackId:trackId,userId:userId},timestamp:Date.now(),sessionId:'debug-session',runId:'rating-fix',hypothesisId:'O'})}).catch(()=>{});
-      // #endregion
       const comment = await commentsApi.createComment(trackId, userId, newComment);
       setComments([comment, ...comments]);
       setNewComment('');
       setError(null);
     } catch (err) {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CommentsSection.jsx:38',message:'Comment create error',data:{error:err.message,errorResponse:err.response?.data},timestamp:Date.now(),sessionId:'debug-session',runId:'rating-fix',hypothesisId:'O'})}).catch(()=>{});
-      // #endregion
       setError('Failed to add comment');
       console.error(err);
     }

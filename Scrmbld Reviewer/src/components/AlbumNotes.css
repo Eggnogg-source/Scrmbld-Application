@@ -1,9 +1,9 @@
 .album-notes {
   margin: 2rem 0;
   padding: 1.5rem;
-  background: #f9f9f9;
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .album-notes-header {
@@ -21,24 +21,25 @@
 
 .lock-button {
   background: none;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 500px;
   padding: 0.4rem 0.6rem;
   cursor: pointer;
   font-size: 1.2rem;
   transition: all 0.2s;
+  color: #b3b3b3;
 }
 
 .lock-button.locked {
-  background: #fee;
-  border-color: #c33;
-  color: #c33;
+  background: rgba(226, 33, 52, 0.2);
+  border-color: #e22134;
+  color: #e22134;
 }
 
 .lock-button.unlocked {
-  background: #f0f0f0;
-  border-color: #ddd;
-  color: #666;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #b3b3b3;
 }
 
 .lock-button:hover {
@@ -46,8 +47,8 @@
 }
 
 .locked-warning {
-  background: #fff3cd;
-  color: #856404;
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
   padding: 0.5rem;
   border-radius: 4px;
   margin-bottom: 0.5rem;
@@ -57,29 +58,31 @@
 .album-notes-header h2 {
   margin: 0;
   font-size: 1.5rem;
-  color: #333;
-  font-weight: 600;
+  color: #ffffff;
+  font-weight: 700;
 }
 
 .edit-note-button {
-  background: none;
-  border: none;
-  color: #1db954;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  font-weight: 700;
   padding: 0.5rem 1rem;
-  border: 1px solid #1db954;
-  border-radius: 4px;
+  border-radius: 500px;
+  transition: all 0.2s;
 }
 
 .edit-note-button:hover {
-  background-color: #1db954;
-  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.05);
 }
 
 .error-message {
-  background-color: #fee;
-  color: #c33;
+  background-color: rgba(226, 33, 52, 0.2);
+  color: #e22134;
   padding: 0.75rem;
   border-radius: 4px;
   margin-bottom: 1rem;
@@ -87,7 +90,7 @@
 }
 
 .loading {
-  color: #666;
+  color: #b3b3b3;
   font-size: 0.9rem;
   padding: 1rem 0;
 }
@@ -101,17 +104,24 @@
 .note-input {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #ddd;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   font-family: inherit;
   font-size: 1rem;
   resize: vertical;
   box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.note-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .note-input:focus {
   outline: none;
   border-color: #1db954;
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .note-actions {
@@ -124,19 +134,21 @@
 .delete-note-button {
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  border-radius: 500px;
+  font-size: 0.875rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .save-note-button {
   background-color: #1db954;
-  color: white;
+  color: #000000;
 }
 
 .save-note-button:hover:not(:disabled) {
   background-color: #1ed760;
+  transform: scale(1.05);
 }
 
 .save-note-button:disabled {
@@ -145,21 +157,25 @@
 }
 
 .cancel-note-button {
-  background-color: #f0f0f0;
-  color: #333;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .cancel-note-button:hover {
-  background-color: #e0e0e0;
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
 }
 
 .delete-note-button {
-  background-color: #fee;
-  color: #c33;
+  background-color: rgba(226, 33, 52, 0.2);
+  color: #e22134;
+  border: 1px solid rgba(226, 33, 52, 0.5);
 }
 
 .delete-note-button:hover {
-  background-color: #fdd;
+  background-color: rgba(226, 33, 52, 0.3);
+  transform: scale(1.05);
 }
 
 .note-display {
@@ -167,7 +183,7 @@
 }
 
 .note-content {
-  color: #333;
+  color: #ffffff;
   white-space: pre-wrap;
   word-wrap: break-word;
   font-size: 1rem;

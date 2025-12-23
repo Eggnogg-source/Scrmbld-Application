@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { getAllAlbumTracks, makeRequest } from '../services/spotifyApi';
 import { syncApi } from '../services/api';
@@ -6,6 +6,7 @@ import TrackCard from './TrackCard';
 import TrackNotes from './TrackNotes';
 import AlbumNotes from './AlbumNotes';
 import AlbumScore from './AlbumScore';
+import { extractColorsFromImage } from '../utils/colorExtractor';
 import './AlbumDetail.css';
 
 function AlbumDetail({ userId }) {
@@ -16,12 +17,30 @@ function AlbumDetail({ userId }) {
   const [error, setError] = useState(null);
   const [listened, setListened] = useState(false);
   const [scoreRefreshTrigger, setScoreRefreshTrigger] = useState(0);
+  const [gradientColors, setGradientColors] = useState(null);
+  const headerWrapperRef = useRef(null);
 
   useEffect(() => {
     if (albumId) {
       loadAlbumData();
     }
   }, [albumId]);
+
+  // Extract colors from album image when album loads
+  useEffect(() => {
+    if (album?.images?.[0]?.url) {
+      extractColorsFromImage(album.images[0].url).then(colors => {
+        setGradientColors(colors);
+        // Apply colors to CSS variables
+        if (headerWrapperRef.current) {
+          const element = headerWrapperRef.current;
+          element.style.setProperty('--gradient-primary', colors.primaryRgba);
+          element.style.setProperty('--gradient-secondary', colors.secondaryRgba);
+          element.style.setProperty('--gradient-tertiary', colors.tertiaryRgba);
+        }
+      });
+    }
+  }, [album]);
 
   const loadAlbumData = async () => {
     try {
@@ -96,31 +115,35 @@ function AlbumDetail({ userId }) {
   return (
     <div className="album-detail">
       {album && (
-        <div className="album-header">
-          {album.images && album.images[0] && (
-            <img
-              src={album.images[0].url}
-              alt={album.name}
-              className="album-image"
-            />
-          )}
-          <div className="album-info">
-            <h1>{album.name}</h1>
-            <h2>{album.artists?.map(a => a.name).join(', ')}</h2>
-            {album.release_date && (
-              <p className="release-date">Released: {album.release_date}</p>
+        <div className="album-header-wrapper" ref={headerWrapperRef}>
+          <div className="album-header">
+            {album.images && album.images[0] && (
+              <img
+                src={album.images[0].url}
+                alt={album.name}
+                className="album-image"
+              />
             )}
-            <p className="track-count">{tracks.length} tracks</p>
-            <div className="album-actions">
-              <button
-                className={`listened-toggle ${listened ? 'listened' : 'not-listened'}`}
-                onClick={handleListenedToggle}
-                title={listened ? 'Mark as not listened' : 'Mark as listened'}
-              >
-                {listened ? 'Listened To' : "Haven't Heard"}
-              </button>
+            <div className="album-info">
+              <h1>{album.name}</h1>
+              <h2>{album.artists?.map(a => a.name).join(', ')}</h2>
+              {album.release_date && (
+                <p className="release-date">{album.release_date} • {tracks.length} songs</p>
+              )}
+              {!album.release_date && (
+                <p className="track-count">{tracks.length} songs</p>
+              )}
+              <div className="album-actions">
+                <button
+                  className={`listened-toggle ${listened ? 'listened' : 'not-listened'}`}
+                  onClick={handleListenedToggle}
+                  title={listened ? 'Mark as not listened' : 'Mark as listened'}
+                >
+                  {listened ? 'Listened To' : "Haven't Heard"}
+                </button>
+              </div>
+              <AlbumScore albumId={albumId} tracks={tracks} userId={userId} refreshTrigger={scoreRefreshTrigger} />
             </div>
-            <AlbumScore albumId={albumId} tracks={tracks} userId={userId} refreshTrigger={scoreRefreshTrigger} />
           </div>
         </div>
       )}
@@ -132,8 +155,12 @@ function AlbumDetail({ userId }) {
       )}
 
       <div className="tracks-section">
-        <h2>Tracks</h2>
         <div className="tracks-list">
+          <div className="tracks-header">
+            <div className="tracks-header-number">#</div>
+            <div className="tracks-header-title">Title</div>
+            <div className="tracks-header-rating">Rating</div>
+          </div>
           {tracks.map((track) => (
             <div key={track.id} className="track-wrapper">
               <TrackCard

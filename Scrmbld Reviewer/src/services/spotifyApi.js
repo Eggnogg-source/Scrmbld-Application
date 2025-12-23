@@ -3,23 +3,15 @@
 const SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/authorize';
 const SPOTIFY_API_BASE = 'https://api.spotify.com/v1';
 const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-// #region agent log
+
 const getRedirectURI = () => {
   const hostname = window.location.hostname;
   const port = window.location.port || '5173';
-  // Always use 127.0.0.1 for local development (Spotify requirement - localhost not allowed)
-  // Check if we're in local development (localhost or 127.0.0.1)
   const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
-  const redirectURI = isLocal 
+  return isLocal 
     ? `http://127.0.0.1:${port}/callback`
     : `${window.location.origin}/callback`;
-  fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:6',message:'Redirect URI construction',data:{hostname:hostname,port:port,isLocal:isLocal,redirectURI:redirectURI,fullOrigin:window.location.origin},timestamp:Date.now(),sessionId:'debug-session',runId:'fix-v2',hypothesisId:'A'})}).catch(()=>{});
-  return redirectURI;
 };
-// Compute redirect URI dynamically each time to ensure fresh value
-const getRedirectURIValue = () => getRedirectURI();
-const REDIRECT_URI = getRedirectURI();
-// #endregion
 const SCOPES = [
   'user-library-read',
   'user-library-modify',
@@ -58,25 +50,17 @@ export async function loginToSpotify() {
   const state = generateRandomString(16);
   localStorage.setItem('spotify_auth_state', state);
 
-  // Get fresh redirect URI value
-  const currentRedirectURI = getRedirectURIValue();
-  
   const params = new URLSearchParams({
     response_type: 'code',
     client_id: CLIENT_ID,
     scope: SCOPES.join(' '),
-    redirect_uri: currentRedirectURI,
+    redirect_uri: getRedirectURI(),
     state: state,
     code_challenge_method: 'S256',
     code_challenge: codeChallenge,
   });
 
-  // #region agent log
-  const authURL = `${SPOTIFY_AUTH_URL}?${params.toString()}`;
-  fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:49',message:'OAuth authorization request',data:{redirectURI:currentRedirectURI,clientId:CLIENT_ID,hasCodeChallenge:!!codeChallenge,authURL:authURL.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'fix-v2',hypothesisId:'B'})}).catch(()=>{});
-  // #endregion
-
-  window.location.href = authURL;
+  window.location.href = `${SPOTIFY_AUTH_URL}?${params.toString()}`;
 }
 
 // Exchange authorization code for access token
@@ -87,13 +71,6 @@ export async function getAccessToken(code) {
     throw new Error('Code verifier not found');
   }
 
-  // Get fresh redirect URI value for token exchange
-  const currentRedirectURI = getRedirectURIValue();
-  
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:75',message:'Token exchange request - before fetch',data:{redirectURI:currentRedirectURI,hasCode:!!code,codeLength:code?.length,hasCodeVerifier:!!codeVerifier},timestamp:Date.now(),sessionId:'debug-session',runId:'fix-v2',hypothesisId:'C'})}).catch(()=>{});
-  // #endregion
-  
   const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
@@ -103,27 +80,17 @@ export async function getAccessToken(code) {
       client_id: CLIENT_ID,
       grant_type: 'authorization_code',
       code: code,
-      redirect_uri: currentRedirectURI,
+      redirect_uri: getRedirectURI(),
       code_verifier: codeVerifier,
     }),
   });
 
-  // #region agent log
-  const responseText = await response.text();
-  let responseData;
-  try {
-    responseData = JSON.parse(responseText);
-  } catch {
-    responseData = { raw: responseText.substring(0, 200) };
-  }
-  fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:110',message:'Token exchange response',data:{status:response.status,statusText:response.statusText,ok:response.ok,responseData:responseData,redirectURI:currentRedirectURI},timestamp:Date.now(),sessionId:'debug-session',runId:'fix-v2',hypothesisId:'C'})}).catch(()=>{});
-  // #endregion
-
   if (!response.ok) {
-    throw new Error(`Failed to get access token: ${response.status} ${response.statusText} - ${JSON.stringify(responseData)}`);
+    const errorText = await response.text();
+    throw new Error(`Failed to get access token: ${response.status} ${response.statusText}`);
   }
 
-  const data = responseData;
+  const data = await response.json();
   localStorage.setItem('spotify_access_token', data.access_token);
   localStorage.setItem('spotify_refresh_token', data.refresh_token);
   localStorage.removeItem('code_verifier');
@@ -185,10 +152,6 @@ export function logout() {
 export async function makeRequest(endpoint, options = {}) {
   let token = getStoredAccessToken();
   
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:143',message:'makeRequest called',data:{endpoint:endpoint,hasToken:!!token,tokenLength:token?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'loading-debug',hypothesisId:'K'})}).catch(()=>{});
-  // #endregion
-  
   if (!token) {
     throw new Error('Not authenticated');
   }
@@ -224,18 +187,10 @@ export async function makeRequest(endpoint, options = {}) {
   }
 
   if (!response.ok) {
-    // #region agent log
-    const errorText = await response.text();
-    fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:222',message:'makeRequest API error',data:{status:response.status,statusText:response.statusText,endpoint:endpoint,errorText:errorText.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'loading-debug',hypothesisId:'K'})}).catch(()=>{});
-    // #endregion
     throw new Error(`Spotify API error: ${response.status} ${response.statusText}`);
   }
 
-  const result = await response.json();
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:228',message:'makeRequest success',data:{endpoint:endpoint,status:response.status,hasItems:!!result.items,itemsCount:result.items?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'loading-debug',hypothesisId:'K'})}).catch(()=>{});
-  // #endregion
-  return result;
+  return await response.json();
 }
 
 // Get current user profile
@@ -258,37 +213,16 @@ export async function getSavedAlbums(limit = 50, offset = 0) {
 
 // Get all saved albums (handles pagination)
 export async function getAllSavedAlbums() {
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:243',message:'getAllSavedAlbums started',data:{hasToken:!!getStoredAccessToken()},timestamp:Date.now(),sessionId:'debug-session',runId:'loading-debug',hypothesisId:'I'})}).catch(()=>{});
-  // #endregion
   let allAlbums = [];
   let offset = 0;
   const limit = 50;
   let hasMore = true;
-  let pageCount = 0;
 
-  try {
-    while (hasMore) {
-      pageCount++;
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:250',message:'getAllSavedAlbums page request',data:{page:pageCount,offset:offset,limit:limit},timestamp:Date.now(),sessionId:'debug-session',runId:'loading-debug',hypothesisId:'I'})}).catch(()=>{});
-      // #endregion
-      const data = await makeRequest(`/me/albums?limit=${limit}&offset=${offset}`);
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:253',message:'getAllSavedAlbums page response',data:{page:pageCount,itemsCount:data.items?.length||0,total:data.total,hasNext:!!data.next,currentTotal:allAlbums.length},timestamp:Date.now(),sessionId:'debug-session',runId:'loading-debug',hypothesisId:'I'})}).catch(()=>{});
-      // #endregion
-      allAlbums = [...allAlbums, ...data.items.map(item => item.album)];
-      hasMore = data.next !== null;
-      offset += limit;
-    }
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:259',message:'getAllSavedAlbums completed',data:{totalAlbums:allAlbums.length,pages:pageCount},timestamp:Date.now(),sessionId:'debug-session',runId:'loading-debug',hypothesisId:'I'})}).catch(()=>{});
-    // #endregion
-  } catch (err) {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:262',message:'getAllSavedAlbums error',data:{error:err.message,errorName:err.name,albumsSoFar:allAlbums.length},timestamp:Date.now(),sessionId:'debug-session',runId:'loading-debug',hypothesisId:'I'})}).catch(()=>{});
-    // #endregion
-    throw err;
+  while (hasMore) {
+    const data = await makeRequest(`/me/albums?limit=${limit}&offset=${offset}`);
+    allAlbums = [...allAlbums, ...data.items.map(item => item.album)];
+    hasMore = data.next !== null;
+    offset += limit;
   }
 
   return allAlbums;
@@ -307,37 +241,16 @@ export async function getPlaylists(limit = 50, offset = 0) {
 
 // Get all playlists (handles pagination)
 export async function getAllPlaylists() {
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:287',message:'getAllPlaylists started',data:{hasToken:!!getStoredAccessToken()},timestamp:Date.now(),sessionId:'debug-session',runId:'loading-debug',hypothesisId:'J'})}).catch(()=>{});
-  // #endregion
   let allPlaylists = [];
   let offset = 0;
   const limit = 50;
   let hasMore = true;
-  let pageCount = 0;
 
-  try {
-    while (hasMore) {
-      pageCount++;
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:293',message:'getAllPlaylists page request',data:{page:pageCount,offset:offset,limit:limit},timestamp:Date.now(),sessionId:'debug-session',runId:'loading-debug',hypothesisId:'J'})}).catch(()=>{});
-      // #endregion
-      const data = await makeRequest(`/me/playlists?limit=${limit}&offset=${offset}`);
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:296',message:'getAllPlaylists page response',data:{page:pageCount,itemsCount:data.items?.length||0,total:data.total,hasNext:!!data.next,currentTotal:allPlaylists.length},timestamp:Date.now(),sessionId:'debug-session',runId:'loading-debug',hypothesisId:'J'})}).catch(()=>{});
-      // #endregion
-      allPlaylists = [...allPlaylists, ...data.items];
-      hasMore = data.next !== null;
-      offset += limit;
-    }
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:303',message:'getAllPlaylists completed',data:{totalPlaylists:allPlaylists.length,pages:pageCount},timestamp:Date.now(),sessionId:'debug-session',runId:'loading-debug',hypothesisId:'J'})}).catch(()=>{});
-    // #endregion
-  } catch (err) {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/e969b3c1-901c-484b-8b79-d34d8d6b91a2',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'spotifyApi.js:306',message:'getAllPlaylists error',data:{error:err.message,errorName:err.name,playlistsSoFar:allPlaylists.length},timestamp:Date.now(),sessionId:'debug-session',runId:'loading-debug',hypothesisId:'J'})}).catch(()=>{});
-    // #endregion
-    throw err;
+  while (hasMore) {
+    const data = await makeRequest(`/me/playlists?limit=${limit}&offset=${offset}`);
+    allPlaylists = [...allPlaylists, ...data.items];
+    hasMore = data.next !== null;
+    offset += limit;
   }
 
   return allPlaylists;
