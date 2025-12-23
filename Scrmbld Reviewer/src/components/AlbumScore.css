@@ -1,0 +1,52 @@
+.album-score {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+}
+
+.score-label {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.score-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.score-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1db954;
+}
+
+.score-value.no-score {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #999;
+}
+
+.score-grade {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1db954;
+}
+
+.score-info {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.album-score-loading {
+  margin-top: 1rem;
+  padding: 1rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+

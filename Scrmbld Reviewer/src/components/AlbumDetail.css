@@ -1,0 +1,120 @@
+.album-detail {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.loading-container,
+.error-container {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+}
+
+.error-container {
+  color: #c33;
+}
+
+.album-header {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.album-image {
+  width: 250px;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.album-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.album-info h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2.5rem;
+  color: #333;
+}
+
+.album-info h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  color: #666;
+  font-weight: 400;
+}
+
+.release-date,
+.track-count {
+  margin: 0.5rem 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+.album-actions {
+  margin: 1rem 0;
+}
+
+.listened-toggle {
+  padding: 0.5rem 1rem;
+  border: 2px solid #1db954;
+  border-radius: 4px;
+  background: white;
+  color: #1db954;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.listened-toggle.listened {
+  background: #1db954;
+  color: white;
+}
+
+.listened-toggle.not-listened {
+  background: white;
+  color: #1db954;
+}
+
+.listened-toggle:hover {
+  background: #1ed760;
+  color: white;
+  border-color: #1ed760;
+}
+
+.tracks-section {
+  margin-top: 2rem;
+}
+
+.tracks-section h2 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.tracks-list {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.track-wrapper {
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.track-wrapper:last-child {
+  border-bottom: none;
+}
+
+.track-detail-view {
+  padding: 0 1rem 1rem 1rem;
+  background: #f9f9f9;
+}
+
