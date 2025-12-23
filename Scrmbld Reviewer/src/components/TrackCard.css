@@ -3,24 +3,24 @@
   grid-template-columns: [index] 16px [first] 4fr [var1] 2fr [last] minmax(120px, 1fr);
   gap: 16px;
   align-items: center;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 1rem;
   border-radius: 4px;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   color: #b3b3b3;
   position: relative;
-  min-height: 56px;
+  min-height: 44px;
 }
 
 .track-card:hover {
   background-color: rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .track-number {
   color: #b3b3b3;
-  font-size: 1rem;
+  font-size: 0.875rem;
   min-width: 16px;
   text-align: center;
   font-variant-numeric: tabular-nums;
@@ -52,11 +52,11 @@
 .track-name {
   font-weight: 400;
   color: #ffffff;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.125rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -68,16 +68,16 @@
 
 .untouched-indicator {
   color: #b3b3b3;
-  font-size: 1rem;
+  font-size: 0.875rem;
   line-height: 1;
   display: inline-block;
 }
 
 .track-duration {
   color: #b3b3b3;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
-  margin-top: 0.25rem;
+  margin-top: 0.125rem;
 }
 
 .track-card:hover .track-duration {

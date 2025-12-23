@@ -16,7 +16,7 @@ function LibraryView() {
   const [totalAlbums, setTotalAlbums] = useState(0);
   const [totalPlaylists, setTotalPlaylists] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const itemsPerPage = 20;
+  const itemsPerPage = 36;
 
   useEffect(() => {
     if (isAuthenticated()) {

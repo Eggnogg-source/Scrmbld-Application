@@ -4,6 +4,7 @@
   margin: 0 auto;
   min-height: 100vh;
   background-color: #121212;
+  animation: fadeIn 0.5s ease-out;
 }
 
 @media (max-width: 768px) {
@@ -96,18 +97,38 @@
   color: #b3b3b3;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-transform: uppercase;
   letter-spacing: 0.1em;
+  position: relative;
+}
+
+.tab::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #1db954;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tab:hover {
   color: #ffffff;
 }
 
+.tab:hover::after {
+  width: 100%;
+}
+
 .tab.active {
   color: #ffffff;
   border-bottom-color: #1db954;
+}
+
+.tab.active::after {
+  width: 100%;
 }
 
 .search-bar-container {
@@ -123,7 +144,8 @@
   font-size: 0.875rem;
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideInRight 0.5s ease-out 0.2s both;
 }
 
 .search-input::placeholder {
@@ -150,18 +172,32 @@
 .album-card,
 .playlist-card {
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 8px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.05);
   padding: 1rem;
   position: relative;
+  animation: scaleIn 0.4s ease-out both;
 }
+
+.album-card:nth-child(1), .playlist-card:nth-child(1) { animation-delay: 0.05s; }
+.album-card:nth-child(2), .playlist-card:nth-child(2) { animation-delay: 0.1s; }
+.album-card:nth-child(3), .playlist-card:nth-child(3) { animation-delay: 0.15s; }
+.album-card:nth-child(4), .playlist-card:nth-child(4) { animation-delay: 0.2s; }
+.album-card:nth-child(5), .playlist-card:nth-child(5) { animation-delay: 0.25s; }
+.album-card:nth-child(6), .playlist-card:nth-child(6) { animation-delay: 0.3s; }
+.album-card:nth-child(7), .playlist-card:nth-child(7) { animation-delay: 0.35s; }
+.album-card:nth-child(8), .playlist-card:nth-child(8) { animation-delay: 0.4s; }
+.album-card:nth-child(9), .playlist-card:nth-child(9) { animation-delay: 0.45s; }
+.album-card:nth-child(10), .playlist-card:nth-child(10) { animation-delay: 0.5s; }
+.album-card:nth-child(n+11), .playlist-card:nth-child(n+11) { animation-delay: 0.55s; }
 
 .album-card:hover,
 .playlist-card:hover {
   background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-4px);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
 }
 
 .album-cover,
@@ -172,6 +208,13 @@
   border-radius: 4px;
   margin-bottom: 1rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+}
+
+.album-card:hover .album-cover,
+.playlist-card:hover .playlist-cover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
 }
 
 .album-card-info,
