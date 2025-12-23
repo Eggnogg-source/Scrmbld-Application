@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSavedAlbums, getPlaylists, isAuthenticated, loginToSpotify } from '../services/spotifyApi';
 import './LibraryView.css';
+import './LoadingSpinner.css';
 
 function LibraryView() {
   const navigate = useNavigate();
@@ -131,7 +132,12 @@ function LibraryView() {
   }
 
   if (loading) {
-    return <div className="loading-container">Loading your library...</div>;
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading your library...</p>
+      </div>
+    );
   }
 
   if (error) {

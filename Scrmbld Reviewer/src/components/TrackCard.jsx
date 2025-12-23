@@ -46,8 +46,8 @@ function TrackCard({ track, userId, onSync, onRatingChange }) {
 
   return (
     <div className="track-card">
+      <div className="track-number">{track.track_number}</div>
       <div className="track-info">
-        <div className="track-number">{track.track_number}</div>
         <div className="track-details">
           <div className="track-name">
             {track.name}

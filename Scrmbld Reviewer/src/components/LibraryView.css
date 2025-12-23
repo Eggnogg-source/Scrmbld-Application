@@ -1,9 +1,15 @@
 .library-view {
-  padding: 2rem;
+  padding: 2.5rem 2.5rem;
   max-width: 1400px;
   margin: 0 auto;
   min-height: 100vh;
   background-color: #121212;
+}
+
+@media (max-width: 768px) {
+  .library-view {
+    padding: 1.5rem 1rem;
+  }
 }
 
 .login-prompt {
@@ -48,15 +54,12 @@
   transform: scale(1.05);
 }
 
-.loading-container,
+/* Loading styles moved to LoadingSpinner.css */
+
 .error-container {
   text-align: center;
   padding: 3rem;
   font-size: 1.2rem;
-  color: #ffffff;
-}
-
-.error-container {
   color: #e22134;
 }
 

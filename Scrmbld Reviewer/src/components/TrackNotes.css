@@ -1,16 +1,17 @@
 .track-notes {
-  margin-top: 0.5rem;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  border: none;
 }
 
 .notes-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0;
 }
 
 .notes-header h4 {
@@ -61,7 +62,7 @@
 
 .note-input {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   font-family: inherit;
@@ -70,6 +71,7 @@
   box-sizing: border-box;
   background: rgba(255, 255, 255, 0.05);
   color: #ffffff;
+  line-height: 1.5;
 }
 
 .note-input::placeholder {
@@ -137,7 +139,7 @@
 }
 
 .note-display {
-  padding: 0.5rem 0;
+  padding: 0;
 }
 
 .note-content {
@@ -145,6 +147,8 @@
   white-space: pre-wrap;
   word-wrap: break-word;
   font-size: 0.875rem;
-  line-height: 1.5;
+  line-height: 1.6;
+  padding: 0;
+  margin: 0;
 }
 

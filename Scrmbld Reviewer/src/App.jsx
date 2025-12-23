@@ -8,6 +8,7 @@ import AlbumDetail from './components/AlbumDetail';
 import PlaylistDetail from './components/PlaylistDetail';
 import Callback from './components/Callback';
 import './App.css';
+import './components/LoadingSpinner.css';
 
 function App() {
   const [userId, setUserId] = useState(null);
@@ -45,13 +46,9 @@ function App() {
 
   if (loading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
-      }}>
-        <div>Loading...</div>
+      <div className="loading-fullscreen">
+        <div className="loading-spinner"></div>
+        <p>Loading...</p>
       </div>
     );
   }

@@ -8,6 +8,7 @@ import AlbumNotes from './AlbumNotes';
 import AlbumScore from './AlbumScore';
 import { extractColorsFromImage } from '../utils/colorExtractor';
 import './AlbumDetail.css';
+import './LoadingSpinner.css';
 
 function AlbumDetail({ userId }) {
   const { albumId } = useParams();
@@ -105,7 +106,12 @@ function AlbumDetail({ userId }) {
   };
 
   if (loading) {
-    return <div className="loading-container">Loading album...</div>;
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading album...</p>
+      </div>
+    );
   }
 
   if (error) {

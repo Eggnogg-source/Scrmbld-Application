@@ -3,36 +3,19 @@
   grid-template-columns: [index] 16px [first] 4fr [var1] 2fr [last] minmax(120px, 1fr);
   gap: 16px;
   align-items: center;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
   border-radius: 4px;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
   color: #b3b3b3;
   position: relative;
+  min-height: 56px;
 }
 
 .track-card:hover {
   background-color: rgba(255, 255, 255, 0.1);
   color: #ffffff;
-}
-
-.track-card:hover .track-number {
-  opacity: 0;
-}
-
-.track-card:hover::before {
-  content: '▶';
-  position: absolute;
-  left: 1rem;
-  color: #ffffff;
-  font-size: 0.875rem;
-}
-
-.track-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex: 1;
-  grid-column: first / last;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .track-number {
@@ -41,7 +24,24 @@
   min-width: 16px;
   text-align: center;
   font-variant-numeric: tabular-nums;
-  transition: opacity 0.2s;
+  transition: color 0.2s;
+  grid-column: index;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.track-card:hover .track-number {
+  color: #ffffff;
+}
+
+.track-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  grid-column: first / var1;
+  min-width: 0;
 }
 
 .track-details {
@@ -77,8 +77,7 @@
   color: #b3b3b3;
   font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
-  text-align: right;
-  grid-column: last;
+  margin-top: 0.25rem;
 }
 
 .track-card:hover .track-duration {

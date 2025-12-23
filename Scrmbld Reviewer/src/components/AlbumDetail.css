@@ -4,9 +4,21 @@
   background: linear-gradient(180deg, rgba(18, 18, 18, 0) 0%, #121212 100%);
 }
 
+/* Adjust padding for responsive design */
+@media (max-width: 768px) {
+  .album-header-wrapper {
+    padding: 1.5rem 1rem 0 1rem;
+  }
+  
+  .album-notes-section,
+  .tracks-section {
+    padding: 0 1rem 1.5rem 1rem;
+  }
+}
+
 .album-header-wrapper {
   position: relative;
-  padding: 2rem 2rem 0 2rem;
+  padding: 2.5rem 2.5rem 0 2.5rem;
   /* Dynamic gradient based on album colors - similar to Spotify */
   background: linear-gradient(
     180deg,
@@ -18,7 +30,7 @@
   min-height: 400px;
   display: flex;
   align-items: flex-end;
-  padding-bottom: 2rem;
+  padding-bottom: 2.5rem;
   transition: background 0.8s ease;
   /* Add a subtle overlay for better text readability */
   position: relative;
@@ -58,8 +70,8 @@
 }
 
 .album-image {
-  width: 232px;
-  height: 232px;
+  width: 400px;
+  height: 400px;
   object-fit: cover;
   border-radius: 0;
   box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5);
@@ -153,13 +165,13 @@
 }
 
 .album-notes-section {
-  padding: 0 2rem;
+  padding: 2rem 2.5rem;
   max-width: 1400px;
   margin: 0 auto;
 }
 
 .tracks-section {
-  padding: 0 2rem 2rem 2rem;
+  padding: 0 2.5rem 2.5rem 2.5rem;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -174,15 +186,15 @@
   display: grid;
   grid-template-columns: [index] 16px [first] 4fr [var1] 2fr [last] minmax(120px, 1fr);
   gap: 16px;
-  padding: 0 1rem;
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 0.5rem;
-  padding-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   color: #b3b3b3;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
+  align-items: center;
 }
 
 .tracks-header-number {
@@ -210,21 +222,20 @@
 }
 
 .track-detail-view {
-  padding: 0 1rem 1rem 1rem;
+  padding: 1rem;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 4px;
-  margin: 0.5rem 0;
+  margin: 0.25rem 0 0.75rem 0;
+  margin-left: calc(16px + 16px + 1rem); /* Align with track content (index + gap + track padding) */
+  margin-right: 1rem;
 }
 
-.loading-container,
+/* Loading styles moved to LoadingSpinner.css */
+
 .error-container {
   text-align: center;
   padding: 3rem;
   font-size: 1.2rem;
-  color: #ffffff;
-}
-
-.error-container {
   color: #e22134;
 }
 

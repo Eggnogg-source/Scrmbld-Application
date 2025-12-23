@@ -5,6 +5,7 @@ import TrackCard from './TrackCard';
 import TrackNotes from './TrackNotes';
 import { extractColorsFromImage } from '../utils/colorExtractor';
 import './AlbumDetail.css';
+import './LoadingSpinner.css';
 
 function PlaylistDetail({ userId }) {
   const { playlistId } = useParams();
@@ -83,7 +84,12 @@ function PlaylistDetail({ userId }) {
   };
 
   if (loading) {
-    return <div className="loading-container">Loading playlist...</div>;
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading playlist...</p>
+      </div>
+    );
   }
 
   if (error) {
